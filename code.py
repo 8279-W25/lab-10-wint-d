@@ -40,18 +40,20 @@ morse_code = {
     '0': '-----'
 }
 def convert_to_morse(text):
-    texts = text.split()
+    texts = text.strip().split()
     morse_text = []
+
     for text in texts:
         morse_char = []
         for char in text:
             if char in morse_code:
                 morse_char.append(morse_code[char])
         if morse_char:
-            morse_text.append("   ".join(morse_char))
-    return "       ".join(morse_text)
+            morse_text.append(" ".join(morse_char))
+    return "//".join(morse_text)
 
-def morse_leds(bit, morse_time):
+def morse_leds(bit, morse_time, brightness_level):
+    cp.pixels.brightness = brightness_level
     if bit == '.':
         cp.pixels.fill((66, 245, 194))
         cp.play_tone(440, morse_time)
@@ -67,16 +69,22 @@ def morse_leds(bit, morse_time):
         time.sleep(morse_time)
     elif bit == ' ':
         time.sleep(morse_time)
-        
+    elif bit == '//':
+        time.sleep(morse_time * 7)
+
 while True:
     try:
-        time_length = float(input("Enter time duration (between 0 and 1): "))
-        user_text = input("Enter sentence: ").lower().strip()
+        time_length = float(input("Enter time duration (between 0 and 1.0): "))
+        brightness = float(input("Enter brightness (between 0 and 1.0): "))
+        user_text = input("Enter sentence: ").lower()
         result = convert_to_morse(user_text)
-        print("Morse code result: \n", result)
+        print("Morse code result:", result)
 
         for bit in result:
-            morse_leds(bit, time_length)
+            morse_leds(bit, time_length, brightness)
+            
+    except ValueError:
+        print("Invalid input. Please try again.")
             
     except ValueError:
         print("Invalid input. Please try again.")
